@@ -1,4 +1,4 @@
-import server from './addons/server.js'
+import server from './addons/express/server.js';
 import dotenv from 'dotenv'
 dotenv.config()
 const port = process.env.PORT || 4000;

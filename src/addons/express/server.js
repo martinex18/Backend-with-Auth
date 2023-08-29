@@ -1,7 +1,7 @@
 import express from 'express'
 const server = express()
 import morgan from 'morgan'
-import router_auth from '../routes/auth.routes/router_auth.js'
+import router_auth from '../../routes/auth.routes/router_auth.js'
 
 
 
