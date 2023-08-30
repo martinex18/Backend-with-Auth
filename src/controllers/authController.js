@@ -1,30 +1,31 @@
 import UserRegister from "../models/registerModel.js";
 import bcrypt from "bcrypt";
-import { CreateAceptToken } from "../addons/libs/jwtAuth.js";
+import { createAccessToken } from "../addons/libs/jwtAuth.js";
 
 export const registerUser = async (req, res) => {
   const { email, user, password } = req.body;
   try {
-    const PassEncry = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new UserRegister({
       email,
       user,
-      password: PassEncry,
+      password: hashedPassword,
     });
-    const UserSave = await newUser.save();
-    const token = await CreateAceptToken({
-      id: UserSave._id,
-      email: UserSave.email,
-      user: UserSave.user,
+    const savedUser = await newUser.save();
+    const token = await createAccessToken({
+      id: savedUser._id,
+      email: savedUser.email,
+      user: savedUser.user,
     });
     res.cookie("token", token);
-    res.json("msg: usuario creado");
+    res.send("Usuario creado");
   } catch (error) {
     if (error.code === 11000) {
-      res.status(500).send("Usuario o correo electronico ya existen");
-    }
-    if (!email || !user || !password) {
-      res.status(500).send("porfavor completa los campos");
+      res.status(500).send("Usuario o correo electrónico ya existen");
+    } else if (!email || !user || !password) {
+      res.status(500).send("Por favor completa los campos");
+    } else {
+      res.status(500).send("Error en el servidor");
     }
   }
 };
@@ -33,18 +34,16 @@ export const LoginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const userFound = await UserRegister.findOne({ email }); // Find a single user based on the provided email
-
+    const userFound = await UserRegister.findOne({ email });
     if (!userFound) {
       return res.status(404).send("Usuario no encontrado");
     }
 
-    const compare =  bcrypt.compare(password, userFound.password);
+    const passwordMatch = await bcrypt.compare(password, userFound.password);
 
-    if (compare) {
-      
-      const token = await CreateAceptToken({ id: userFound.id})
-      res.cookie('token', token)
+    if (passwordMatch) {
+      const token = await createAccessToken({ id: userFound.id });
+      res.cookie("token", token);
       res.send("Inicio de sesión exitoso");
     } else {
       res.status(401).send("Contraseña incorrecta");
@@ -52,4 +51,13 @@ export const LoginUser = async (req, res) => {
   } catch (error) {
     res.status(500).send("Error en el servidor");
   }
+};
+
+export const Logout = (req, res) => {
+  res.cookie("token", "");
+  res.send("Sesión cerrada");
+};
+
+export const Profile = (req, res) => {
+  res.send("/profile");
 };

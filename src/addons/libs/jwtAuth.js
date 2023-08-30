@@ -1,17 +1,15 @@
-
 import jwt from "jsonwebtoken";
-export  function CreateAceptToken(payload) {
-  return new Promise((resolve, reject) => {
-    jwt.sign(
-        payload,
-        "KEYSECRET1233",
-        {
-            expiresIn: "1d"
-        },
-        (err, token) =>{
-            if(err) reject(err)
-            resolve(token)
-        }
-    )
-  })
+
+const secretKey = "KEY-SECRET-XXX";
+const tokenExpiration = "1d";
+
+export async function createAccessToken(payload) {
+  try {
+    const token =  jwt.sign(payload, secretKey, {
+      expiresIn: tokenExpiration
+    });
+    return token;
+  } catch (error) {
+    throw new Error("Error creating access token: " + error.message);
+  }
 }
