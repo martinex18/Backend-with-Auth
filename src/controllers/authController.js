@@ -58,6 +58,14 @@ export const Logout = (req, res) => {
   res.send("Sesión cerrada");
 };
 
-export const Profile = (req, res) => {
-  res.send("/profile");
+export const Profile = async (req, res) => {
+  const userFound = await UserRegister.findById(req.user.id)
+  if(!userFound){
+    res.status(500).send('Usuario no encontrado')
+  }
+  return res.json({
+    id: userFound._id,
+    email: userFound.email,
+    user: userFound.user
+  })
 };
