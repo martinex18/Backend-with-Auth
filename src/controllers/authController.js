@@ -18,7 +18,7 @@ export const registerUser = async (req, res) => {
       user: savedUser.user,
     });
     res.cookie("token", token);
-    res.send("Usuario creado");
+    res.status(200).send("Usuario creado");
   } catch (error) {
     if (error.code === 11000) {
       res.status(500).send("Usuario o correo electrónico ya existen");
@@ -31,10 +31,10 @@ export const registerUser = async (req, res) => {
 };
 
 export const LoginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { user, password } = req.body;
 
   try {
-    const userFound = await UserRegister.findOne({ email });
+    const userFound = await UserRegister.findOne({ user });
     if (!userFound) {
       return res.status(404).send("Usuario no encontrado");
     }
