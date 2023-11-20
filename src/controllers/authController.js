@@ -44,7 +44,7 @@ export const LoginUser = async (req, res) => {
     if (passwordMatch) {
       const token = await createAccessToken({ id: userFound.id });
       res.cookie("token", token);
-      res.send("Inicio de sesión exitoso");
+      res.status(200).send('Inicio Exitoso!');
     } else {
       res.status(401).send("Contraseña incorrecta");
     }
